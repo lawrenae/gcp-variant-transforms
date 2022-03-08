@@ -52,9 +52,6 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install -y \
     libexpat1 
 
-# remove any unneeded packages for security vulnerabilities
-RUN  apt-get remove --purge -y imagemagick imagemagick-6-common libmagickcore-6-headers libmagickcore-dev
-
 RUN mkdir -p /opt/gcp_variant_transforms/bin && mkdir -p /opt/gcp_variant_transforms/src
 ADD / /opt/gcp_variant_transforms/src/
 
@@ -66,6 +63,16 @@ RUN python3 -m venv /opt/gcp_variant_transforms/venv3 && \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install --upgrade wheel && \
     python3 -m pip install --upgrade -r requirements.txt
+
+# remove any unneeded packages for security vulnerabilities
+RUN  apt-get remove --purge -y \
+     imagemagick \
+     imagemagick-6-common \
+     libmagickcore-6-headers \
+     libmagickcore-dev \
+     libwmf0.2-7 \
+     linux-libc-dev:amd64 \
+     && apt autoremove -y
 
 RUN printf '#!/bin/bash\n%s\n%s' \
       ". /opt/gcp_variant_transforms/venv3/bin/activate && cd /opt/gcp_variant_transforms/src" \

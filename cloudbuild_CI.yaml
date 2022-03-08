@@ -49,7 +49,7 @@ steps:
       echo 'Scan ID:' $(cat /workspace/scan_id.txt)
       gcloud artifacts docker images list-vulnerabilities $(cat /workspace/scan_id.txt) \
       --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq CRITICAL; \
-      then echo 'Failed vulnerability check - CRITICAL vulnerabilities found' && exit 1; else exit 0; fi
+      then echo 'Failed vulnerability check - CRITICAL vulnerabilities found' && exit 1; else echo "no CRITICAL vulnerabilities found" && exit 0; fi
     waitFor: ['scan-gcp-variant-transforms-docker']
 
   - id: 'push-gcp-variant-transforms-docker'
@@ -91,7 +91,7 @@ steps:
       echo 'Scan ID:' $(cat /workspace/worker_scan_id.txt)
       gcloud artifacts docker images list-vulnerabilities $(cat /workspace/worker_scan_id.txt) \
       --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq CRITICAL; \
-      then echo 'Failed vulnerability check - CRITICAL vulnerabilities found' && exit 1; else exit 0; fi
+      then echo 'Failed vulnerability check - CRITICAL vulnerabilities found' && exit 1; else echo "no CRITICAL vulnerabilities found" && exit 0; fi
     waitFor: ['scan-gcp-variant-transforms-custom-runner-docker']
 
   - id: 'push-variant-transforms-custom-runner-docker'
