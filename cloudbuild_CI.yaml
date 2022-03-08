@@ -19,7 +19,8 @@
 # * Runs the integration test from that very image.
 
 steps:
-  - name: 'gcr.io/cloud-builders/docker'
+  - id: 'build-gcp-variant-transforms-docker'
+    name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '--build-arg'
@@ -27,20 +28,20 @@ steps:
       - '--tag=gcr.io/${PROJECT_ID}/gcp-variant-transforms:${COMMIT_SHA}'
       - '--file=docker/Dockerfile'
       - '.'
-    id: 'build-gcp-variant-transforms-docker'
     waitFor: ['-']
 
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - id: 'scan-gcp-variant-transforms-docker'
+    name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: '/bin/bash'
     args:
     - -c
     - |
       gcloud artifacts docker images scan gcr.io/${PROJECT_ID}/gcp-variant-transforms:${COMMIT_SHA} \
       --format='value(response.scan)' > /workspace/scan_id.txt
-    id: 'scan-gcp-variant-transforms-docker'
     waitFor: ['build-gcp-variant-transforms-docker']
 
-  - name: gcr.io/cloud-builders/gcloud
+  - id: 'severity-check-gcp-variant-transforms-docker'
+    name: gcr.io/cloud-builders/gcloud
     entrypoint: '/bin/bash'
     args:
     - -c
@@ -49,18 +50,19 @@ steps:
       gcloud artifacts docker images list-vulnerabilities $(cat /workspace/scan_id.txt) \
       --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq CRITICAL; \
       then echo 'Failed vulnerability check - CRITICAL vulnerabilities found' && exit 1; else exit 0; fi
-    id: 'severity-check-gcp-variant-transforms-docker'
     waitFor: ['scan-gcp-variant-transforms-docker']
 
-  - name: 'gcr.io/cloud-builders/docker'
+  - id: 'push-gcp-variant-transforms-docker'
+    name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - 'gcr.io/${PROJECT_ID}/gcp-variant-transforms:${COMMIT_SHA}'
-    id: 'push-gcp-variant-transforms-docker'
     waitFor: ['severity-check-gcp-variant-transforms-docker']
 
 # ----------------------------------------------------------------
-  - name: 'gcr.io/cloud-builders/docker'
+# Custom Runner build
+  - id: 'build-variant-transforms-custom-runner-docker'
+    name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '--build-arg'
@@ -68,39 +70,42 @@ steps:
       - '--tag=gcr.io/${PROJECT_ID}/variant-transforms-custom-runner:${COMMIT_SHA}'
       - '--file=docker/Dockerfile.custom_dataflow_container'
       - '.'
-    id: 'build-variant-transforms-custom-runner-docker'
     waitFor: ['-']
 
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - id: 'scan-gcp-variant-transforms-custom-runner-docker'
+    name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: '/bin/bash'
     args:
     - -c
     - |
-      gcloud artifacts docker images scan gcr.io/${PROJECT_ID}/gcp-variant-transforms:${COMMIT_SHA} \
-      --format='value(response.scan)' > /workspace/scan_id.txt
-    id: 'scan-gcp-variant-transforms-custom-runner-docker'
+      gcloud artifacts docker images scan gcr.io/${PROJECT_ID}/variant-transforms-custom-runner:${COMMIT_SHA} \
+      --format='value(response.scan)' > /workspace/worker_scan_id.txt
     waitFor: ['build-variant-transforms-custom-runner-docker']
 
-  - name: gcr.io/cloud-builders/gcloud
+  - id: 'severity-check-gcp-variant-transforms-custom-runner-docker'
+    name: gcr.io/cloud-builders/gcloud
     entrypoint: '/bin/bash'
     args:
     - -c
     - |
-      echo 'Scan ID:' $(cat /workspace/scan_id.txt)
-      gcloud artifacts docker images list-vulnerabilities $(cat /workspace/scan_id.txt) \
+      echo 'Scan ID:' $(cat /workspace/worker_scan_id.txt)
+      gcloud artifacts docker images list-vulnerabilities $(cat /workspace/worker_scan_id.txt) \
       --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq CRITICAL; \
       then echo 'Failed vulnerability check - CRITICAL vulnerabilities found' && exit 1; else exit 0; fi
-    id: 'severity-check-gcp-variant-transforms-custom-runner-docker'
     waitFor: ['scan-gcp-variant-transforms-custom-runner-docker']
 
-  - name: 'gcr.io/cloud-builders/docker'
+  - id: 'push-variant-transforms-custom-runner-docker'
+    name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - 'gcr.io/${PROJECT_ID}/variant-transforms-custom-runner:${COMMIT_SHA}'
-    id: 'push-variant-transforms-custom-runner-docker'
     waitFor: ['severity-check-gcp-variant-transforms-custom-runner-docker']
 
-  - name: 'gcr.io/${PROJECT_ID}/gcp-variant-transforms:${COMMIT_SHA}'
+# ----------------------------------------------------------------
+# Tests
+
+  - id: 'test-gcp-variant-transforms-docker'
+    name: 'gcr.io/${PROJECT_ID}/gcp-variant-transforms:${COMMIT_SHA}'
     args:
       - '--keep_image'
       - '--skip_build'
@@ -111,7 +116,6 @@ steps:
       - '--run_bq_to_vcf_tests'
       - '--run_all_tests'
       - '--test_name_prefix cloud-ci-'
-    id: 'test-gcp-variant-transforms-docker'
     entrypoint: '/opt/gcp_variant_transforms/src/deploy_and_run_tests.sh'
 
      # By default the script uses a GS bucket of gcp-variant-transforms-test
