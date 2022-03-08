@@ -105,7 +105,6 @@ gcloud config set project GOOGLE_CLOUD_PROJECT
 gcloud config set compute/region REGION
 ```
 
-There are options to control which service account, subnet and similar in the [Advanced Flags](docs/advanced_flags.md) documentation.
 
 
 ### Running from github
@@ -190,6 +189,7 @@ details.
 * [Sharding](docs/sharding.md)
 * [Flattening the BigQuery table](docs/flattening_table.md)
 * [Troubleshooting](docs/troubleshooting.md)
+* [Service accounts, subnets and similar](docs/advanced_flags.md).
 
 ## Development
 
