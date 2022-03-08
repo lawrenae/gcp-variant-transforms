@@ -18,7 +18,8 @@
 # https://cloud.google.com/dataflow/docs/guides/using-custom-containers#python
 
 
-FROM apache/beam_python3.8_sdk:2.34.0
+FROM apache/beam_python3.8_sdk:2.36.0
+
 
 RUN apt-get update && apt-get install -y \
     autoconf \
@@ -33,6 +34,21 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     python3-pysam
 
+# install any packages just for security vulnerabilities
+RUN apt-get install -y \
+    libexpat1 \
+    tar 
+
 ADD /requirements.txt /requirements.txt
 
 RUN pip install -r /requirements.txt
+
+# remove any unneeded packages for security vulnerabilities
+RUN  apt-get remove --purge -y \
+     imagemagick \
+     imagemagick-6-common \
+     libmagickcore-6-headers \
+     libmagickcore-dev \
+     libwmf0.2-7 \
+     linux-libc-dev:amd64 \
+     && apt autoremove -y
