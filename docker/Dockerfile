@@ -48,6 +48,12 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-venv
 
+# install any packages just for security vulnerabilities
+RUN apt-get install -y \
+    libexpat1 
+
+# remove any unneeded packages for security vulnerabilities
+RUN  apt-get remove --purge -y imagemagick imagemagick-6-common libmagickcore-6-headers libmagickcore-dev
 
 RUN mkdir -p /opt/gcp_variant_transforms/bin && mkdir -p /opt/gcp_variant_transforms/src
 ADD / /opt/gcp_variant_transforms/src/
