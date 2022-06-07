@@ -42,8 +42,7 @@ python -m gcp_variant_transforms.vcf_to_bq_preprocess \
   --job_name preprocess \
   --staging_location "gs://integration_test_runs/staging" \
   --temp_location "gs://integration_test_runs/temp" \
-  --runner DataflowRunner \
-  --setup_file ./setup.py
+  --runner DataflowRunner 
 """
 
 

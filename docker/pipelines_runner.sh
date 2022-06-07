@@ -119,7 +119,7 @@ function main {
 
   if [[ ! -z "${sdk_container_image}" ]]; then
     echo "Adding --sdk_container_image ${sdk_container_image} to optional_args"
-    df_optional_args="${df_optional_args} --experiments=use_runner_v2 --sdk_container_image=${sdk_container_image}"
+    df_optional_args="${df_optional_args} --experiments=use_runner_v2 --sdk_container_image=${sdk_container_image} --sdk_location=container"
   fi
 
   if [[ ! -z "${subnetwork}" ]]; then

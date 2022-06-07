@@ -51,6 +51,9 @@ RUN apt-get update && apt-get install -y \
 
 RUN mkdir -p /opt/gcp_variant_transforms/bin && mkdir -p /opt/gcp_variant_transforms/src
 ADD / /opt/gcp_variant_transforms/src/
+RUN pip install /opt/gcp_variant_transforms/src/ 
+#&& rm /opt/gcp_variant_transforms/src/setup.py
+
 
 # Install dependencies.
 RUN python3 -m venv /opt/gcp_variant_transforms/venv3 && \
@@ -63,19 +66,19 @@ RUN python3 -m venv /opt/gcp_variant_transforms/venv3 && \
 
 RUN printf '#!/bin/bash\n%s\n%s' \
       ". /opt/gcp_variant_transforms/venv3/bin/activate && cd /opt/gcp_variant_transforms/src" \
-      'python -m gcp_variant_transforms.vcf_to_bq --setup_file ./setup.py "$@"' > \
+      'python -m gcp_variant_transforms.vcf_to_bq "$@"' > \
       /opt/gcp_variant_transforms/bin/vcf_to_bq && \
     chmod +x /opt/gcp_variant_transforms/bin/vcf_to_bq
 
 RUN printf '#!/bin/bash\n%s\n%s' \
       ". /opt/gcp_variant_transforms/venv3/bin/activate && cd /opt/gcp_variant_transforms/src" \
-      'python -m gcp_variant_transforms.vcf_to_bq_preprocess --setup_file ./setup.py "$@"' > \
+      'python -m gcp_variant_transforms.vcf_to_bq_preprocess "$@"' > \
       /opt/gcp_variant_transforms/bin/vcf_to_bq_preprocess && \
     chmod +x /opt/gcp_variant_transforms/bin/vcf_to_bq_preprocess
 
 RUN printf '#!/bin/bash\n%s\n%s' \
       ". /opt/gcp_variant_transforms/venv3/bin/activate && cd /opt/gcp_variant_transforms/src" \
-      'python -m gcp_variant_transforms.bq_to_vcf --setup_file ./setup.py "$@"' > \
+      'python -m gcp_variant_transforms.bq_to_vcf "$@"' > \
       /opt/gcp_variant_transforms/bin/bq_to_vcf && \
     chmod +x /opt/gcp_variant_transforms/bin/bq_to_vcf
 

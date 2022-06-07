@@ -24,8 +24,7 @@ Run locally:
 python -m gcp_variant_transforms.bq_to_vcf \
   --output_file <local path to VCF file> \
   --input_table projectname:bigquerydataset.tablename \
-  --project projectname \
-  --setup_file ./setup.py
+  --project projectname 
 
 Run on Dataflow:
 python -m gcp_variant_transforms.bq_to_vcf \
@@ -35,7 +34,6 @@ python -m gcp_variant_transforms.bq_to_vcf \
   --staging_location gs://bucket/staging \
   --temp_location gs://bucket/temp \
   --job_name bq-to-vcf \
-  --setup_file ./setup.py \
   --runner DataflowRunner
 """
 

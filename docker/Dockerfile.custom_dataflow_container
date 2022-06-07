@@ -36,3 +36,7 @@ RUN apt-get update && apt-get install -y \
 ADD /requirements.txt /requirements.txt
 
 RUN pip install -r /requirements.txt
+
+RUN mkdir -p /opt/gcp_variant_transforms/bin && mkdir -p /opt/gcp_variant_transforms/src
+ADD / /opt/gcp_variant_transforms/src/
+RUN pip install /opt/gcp_variant_transforms/src

@@ -27,7 +27,6 @@ python -m gcp_variant_transforms.vcf_to_bq \
   --staging_location gs://bucket/staging \
   --temp_location gs://bucket/temp \
   --job_name vcf-to-bq \
-  --setup_file ./setup.py \
   --runner DataflowRunner
 """
 

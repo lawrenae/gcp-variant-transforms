@@ -340,11 +340,6 @@ def _raise_error_on_invalid_flags(pipeline_args):
     raise ValueError(
         '--job_name must consist of only the characters [-a-z0-9] starting '
         'with a letter and ending with a letter or number')
-  if (known_pipeline_args.runner == _DATAFLOW_RUNNER_ARG_VALUE and
-      not known_pipeline_args.setup_file):
-    raise ValueError('The --setup_file flag is required for DataflowRunner. '
-                     'Please provide a path to the setup.py file.')
-
 
 
 def is_pipeline_direct_runner(pipeline):
