@@ -111,9 +111,9 @@ class PipelineCommonWithPatternTest(unittest.TestCase):
     pipeline_args.extend(['--job_name', 'correct-01-job-name-02'])
     pipeline_common._raise_error_on_invalid_flags(pipeline_args)
 
+    # Add Dataflow runner. This is now valid.
     pipeline_args.extend(['--runner', 'DataflowRunner'])
-    with self.assertRaisesRegex(ValueError, '--runner'):
-      pipeline_common._raise_error_on_invalid_flags(pipeline_args)
+    pipeline_common._raise_error_on_invalid_flags(pipeline_args)
 
     # Add an unknown flag.
     pipeline_args.extend(['--unknown_flag', 'somevalue'])
